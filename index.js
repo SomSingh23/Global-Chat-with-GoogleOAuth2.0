@@ -14,13 +14,12 @@ let moveNext = (req, res, next) => {
   if (req.isAuthenticated()) {
     next();
   } else {
-    req.flash("error", "you must be logged in to create quotes");
+    req.flash("error", "You must be logged in to write anything 🧑‍💻");
     res.redirect("/login");
   }
 };
-
 mongoose
-  .connect("mongodb://127.0.0.1:27017/ejs_Auth")
+  .connect(process.env.CLOUD_DB)
   .then(() => {
     console.log("MongoDB");
   })
@@ -36,9 +35,9 @@ app.use(
     secret: process.env.SECRET,
     resave: false,
     saveUninitialized: true,
-    cookie: { maxAge: 60 * 60 * 500 },
+    cookie: { maxAge: 10 * 60 * 1000 },
     store: MongoStore.create({
-      mongoUrl: "mongodb://127.0.0.1:27017/session_s__",
+      mongoUrl: process.env.CLOUD_DB,
     }),
   })
 );
@@ -52,8 +51,13 @@ app.listen(process.env.PORT, () => {
   console.log(`Listening on ${process.env.PORT}`);
 });
 app.get("/", async (req, res) => {
+  let isLogedIn = false;
+
+  if (req.user === undefined) isLogedIn = false;
+  else isLogedIn = true;
+
   let data = await Quote.find({}).sort({ createdAt: -1 });
-  res.render("home", { data, message: req.flash("logout") });
+  res.render("home", { data, message: req.flash("success"), isLogedIn });
 });
 app.get("/register", (req, res) => {
   res.render("register");
@@ -100,9 +104,9 @@ app.get("/new", moveNext, (req, res) => {
 });
 app.post("/new", moveNext, async (req, res) => {
   try {
-    req.flash("success", "quote added successfully");
     let data = new Quote({ quote: req.body.quote, author: req.user.username });
     await data.save();
+    req.flash("success", "quote added successfully");
     res.redirect("/");
   } catch (err) {
     res.sendStatus(500);
@@ -116,7 +120,7 @@ app.post("/logout", (req, res) => {
     if (err) {
       return res.status(400).send("error");
     } else {
-      req.flash("logout", "logout successfully");
+      req.flash("success", "logout successfully");
       res.redirect("/");
     }
   });

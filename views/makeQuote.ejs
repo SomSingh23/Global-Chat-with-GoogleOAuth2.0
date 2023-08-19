@@ -6,14 +6,19 @@
     <title>New Quote</title>
   </head>
   <body>
-    <h1><%= message %></h1>
-    <h1>Create a New Quote</h1>
+    <p><%= message %></p>
+    <p>
+      Once you log in, your session will expire after 30 minutes. You'll need to
+      log in again after the session expires.
+    </p>
+    <h2><a href="/">Home Page</a></h2>
+    <h2>Write What Ever You Want ✍️</h2>
 
     <form method="POST" action="/new">
-      <label for="quote">Quote:</label>
-      <input type="text" placeholder="quote" name="quote" />
+      <label for="quote">Write :</label>
+      <input type="text" placeholder="write" name="quote" />
       <br />
-      <button type="submit">Submit Quote</button>
+      <button type="submit">Submit</button>
     </form>
   </body>
 </html>
