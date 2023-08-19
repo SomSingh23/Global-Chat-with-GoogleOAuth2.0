@@ -1,0 +1,20 @@
+{
+  "name": "simple_ejs_app",
+  "version": "1.0.0",
+  "description": "build for learning purpose",
+  "main": "index.js",
+  "repository": "git@github.com:SomSingh23/User-authentication.git",
+  "author": "som singh lodhi",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "mongoose": "^7.4.3",
+    "passport": "^0.6.0",
+    "passport-local": "^1.0.0",
+    "passport-local-mongoose": "^8.0.0"
+  }
+}
