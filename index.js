@@ -4,12 +4,14 @@ let mongoose = require("mongoose");
 let session = require("express-session");
 let passport = require("passport");
 let strategy = require("passport-local");
+var GoogleStrategy = require("passport-google-oauth20").Strategy;
 let path = require("path");
 let User = require("./models/user");
 let app = express();
 const MongoStore = require("connect-mongo");
 let Quote = require("./models/quote");
 let flash = require("connect-flash");
+var findOrCreate = require("mongoose-findorcreate");
 let moveNext = (req, res, next) => {
   if (req.isAuthenticated()) {
     next();
@@ -45,11 +47,50 @@ app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new strategy(User.authenticate()));
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
+// ----------------------------------------------------------------
+passport.serializeUser(function (user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function (user, done) {
+  done(null, user);
+});
+// ----------------------------------------------------------------
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLINT_ID,
+      clientSecret: process.env.CLIENT_SECRET,
+      callbackURL: "http://localhost:8080/auth/google/path",
+    },
+    function (accessToken, refreshToken, profile, cb) {
+      // console.log(profile);
+      User.findOrCreate(
+        { googleId: profile.id, username: profile.displayName },
+        function (err, user) {
+          return cb(err, user);
+        }
+      );
+    }
+  )
+);
 app.listen(process.env.PORT, () => {
   console.log(`Listening on ${process.env.PORT}`);
 });
+app.get(
+  "/auth/google",
+  passport.authenticate("google", {
+    scope: ["profile"],
+  })
+);
+app.get(
+  "/auth/google/path",
+  passport.authenticate("google", { failureRedirect: "/login" }),
+  function (req, res) {
+    // Successful authentication, redirect to new.
+    res.redirect("/new");
+  }
+);
 app.get("/", async (req, res) => {
   let isLogedIn = false;
 
