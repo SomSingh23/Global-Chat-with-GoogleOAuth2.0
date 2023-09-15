@@ -23,7 +23,7 @@ let moveNext = (req, res, next) => {
 mongoose
   .connect(process.env.CLOUD_DB)
   .then(() => {
-    console.log("MongoDB");
+    console.log("☁️🧑‍💻 connected");
   })
   .catch((err) => {
     console.log("Not connected");
